@@ -1,6 +1,6 @@
 import React from "react";
 import {
-    IResourceComponentsProps, 
+    IResourceComponentsProps, useMany, 
 } from "@pankod/refine-core";
 import { useTable, ColumnDef, flexRender } from "@pankod/refine-react-table";
 import {
@@ -19,10 +19,13 @@ import {
     Box,
     EditButton,
     ShowButton,
-    DeleteButton
+    DeleteButton,
+    DateField
 } from "@pankod/refine-chakra-ui";
 import { IconChevronRight, IconChevronLeft } from "@tabler/icons";
 import { IPost } from "interfaces";
+import { ColumnSorter } from "components/ColumnSorter";
+import { ColumnFilter } from "components/ColumnFilter";
 
 export const PostList: React.FC<IResourceComponentsProps> = () => {
     const columns = React.useMemo<ColumnDef<IPost>[]>(
@@ -31,39 +34,45 @@ export const PostList: React.FC<IResourceComponentsProps> = () => {
                 id: "id",
                 accessorKey: "id",
                 header: "Id",
+                meta: {
+                    filterOperator: "contains",
+                },
             },
             {
                 id: "title",
                 accessorKey: "title",
                 header: "Title",
+                meta: {
+                    filterOperator: "contains",
+                },
             },
             {
-                id: "content",
-                accessorKey: "content",
-                header: "Content",
+                id: "category",
+                accessorKey: "category.title",
+                header: "Category",
+                meta: {
+                    filterOperator: "contains",
+                },
+                cell: function render({ getValue, table }) {
+                    return getValue();
+                }
             },
             {
                 id: "createdAt",
                 accessorKey: "createdAt",
                 header: "Created At",
                 cell: function render({ getValue, table }) {
-                    const date:any = getValue();
-                    return new Date(date).toLocaleString('en-us');
-                },
-            },
-            {
-                id: "publishedAt",
-                accessorKey: "publishedAt",
-                header: "Published At",
-                cell: function render({ getValue, table }) {
-                    const date:any = getValue();
-                    return new Date(date).toLocaleString('en-us');
+                    return (
+                        <DateField value={getValue() as string} format="LLL" />
+                    )
                 },
             },
             {
                 id: "actions",
                 accessorKey: "id",
                 header: "Actions",
+                enableSorting: false,
+                enableColumnFilter: false,
                 cell: function render({ getValue }) {
                     return (
                         <HStack>
@@ -99,6 +108,11 @@ export const PostList: React.FC<IResourceComponentsProps> = () => {
         },
     } = useTable({
         columns,
+        refineCoreProps : {
+            metaData: {
+                populate: ["category"],
+            }
+        }
     });
 
     setOptions((prev) => ({
@@ -122,6 +136,8 @@ export const PostList: React.FC<IResourceComponentsProps> = () => {
                                                 header.column.columnDef.header,
                                                 header.getContext(),
                                             )}
+                                        <ColumnSorter column={header.column} />
+                                        <ColumnFilter column={header.column} />
                                     </Th>
                                 ))}
                             </Tr>

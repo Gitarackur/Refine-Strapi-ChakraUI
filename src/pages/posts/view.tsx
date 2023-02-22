@@ -1,4 +1,4 @@
-import { useShow } from "@pankod/refine-core";
+import { useOne, useShow } from "@pankod/refine-core";
 import {
     Show,
     Heading,
@@ -8,10 +8,22 @@ import {
 } from "@pankod/refine-chakra-ui";
 
 export const PostShow = () => {
-    const { queryResult } = useShow();
+    const { queryResult } = useShow({
+        metaData: {
+            populate: ["category"],
+        }
+    });
     const { data, isLoading } = queryResult;
 
     const record = data?.data;
+
+    const { data: categoryData, isLoading: categoryIsLoading } = useOne({
+        resource: "categories",
+        id: record?.category?.id || "",
+        queryOptions: {
+            enabled: !!record,
+        },
+    });
 
     return (
         <Show isLoading={isLoading}>
@@ -24,6 +36,16 @@ export const PostShow = () => {
                 Title
             </Heading>
             <TextField value={record?.title} />
+
+            <Heading as="h5" size="sm" mt={4}>
+                Category
+            </Heading>
+
+            {categoryIsLoading ? (
+                <>Loading...</>
+            ) : (
+                <>{categoryData?.data?.title}</>
+            )}
 
             <Heading as="h5" size="sm" mt={4}>
                 Content
