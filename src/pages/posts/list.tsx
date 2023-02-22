@@ -1,6 +1,6 @@
 import React from "react";
 import {
-	IResourceComponentsProps, useMany,
+	IResourceComponentsProps,
 } from "@pankod/refine-core";
 import { useTable, ColumnDef, flexRender } from "@pankod/refine-react-table";
 import {
