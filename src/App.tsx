@@ -39,6 +39,7 @@ function App() {
             canDelete: true,
           }
         ]}
+        // options={{ mutationMode: "undoable" }}
       />
     </ChakraProvider>
   );
